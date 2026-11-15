@@ -4,6 +4,124 @@ Author: Julien Pigeon for his ML class at CentraleSupelec (MScIA)
 
 ## 1. Fundamental concepts
 
+### 1.1 Bayes theorem
+
+Based on the text we know that:
+$$
+P(+ \mid M) = 0.95 \qquad P(+ \mid \bar{M}) = 0.01 \qquad P(M) = 0.001 \qquad P(\bar{M}) = 1 - P(M) = 0.999
+$$
+ 
+And with the Bayes therorem we can get:
+$$
+P(M \mid +) = \frac{P(+ \mid M)\,P(M)}{P(+ \mid M)\,P(M) + P(+ \mid \bar{M})\,P(\bar{M})}
+$$
+ 
+
+$$
+= \frac{0.95 \times 0.001}{0.95 \times 0.001 + 0.01 \times 0.999} = 0.087
+$$
+ 
+Thus a person with a positive test has only about a 8.7% risk of being infected.
+
+
+### 1.2 Matrix calculus
+
+Let's start by writing $f$ as a double sum over the components of $\mathbf{x}$:
+
+$$
+f(\mathbf{x}) = \mathbf{x}^\top \mathbf{A} \mathbf{x} = \sum_{i=1}^{D} \sum_{j=1}^{D} A_{ij}\, x_i\, x_j
+$$
+ 
+We differentiate with respect to one component $x_k$, using the product rule:
+
+$$
+\frac{\partial (x_i x_j)}{\partial x_k} = \frac{\partial x_i}{\partial x_k}\, x_j + x_i\, \frac{\partial x_j}{\partial x_k} = \delta_{ik}\, x_j + x_i\, \delta_{jk}
+$$
+ 
+ where: 
+$\delta_{ik} = 1$ if $i = k$, and $0$ otherwise. Since the $A_{ij}$ are constants:
+ 
+$$
+\frac{\partial f(\mathbf{x})}{\partial x_k} = \sum_{i=1}^{D} \sum_{j=1}^{D} A_{ij} \left( \delta_{ik}\, x_j + x_i\, \delta_{jk} \right)
+$$
+ 
+$$
+= \sum_{i=1}^{D} \sum_{j=1}^{D} A_{ij}\, \delta_{ik}\, x_j + \sum_{i=1}^{D} \sum_{j=1}^{D} A_{ij}\, x_i\, \delta_{jk}
+$$
+ 
+$\delta_{ik}$ collapses the sum over $i$ to $i = k$, and $\delta_{jk}$ collapses the sum over $j$ to $j = k$:
+ 
+$$
+\Rightarrow \frac{\partial f(\mathbf{x})}{\partial x_k} = \sum_{j=1}^{D} A_{kj}\, x_j + \sum_{i=1}^{D} A_{ik}\, x_i
+$$
+ 
+Using $(\mathbf{A}^\top)_{ki} = A_{ik}$:
+ 
+$$
+\frac{\partial f(\mathbf{x})}{\partial x_k} = \sum_{j=1}^{D} A_{kj}\, x_j + \sum_{i=1}^{D} (\mathbf{A}^\top)_{ki}\, x_i = \sum_{j=1}^{D} \left( A_{kj} + (\mathbf{A}^\top)_{kj} \right) x_j
+$$
+ 
+which is the $k^{\text{th}}$ entry of the matrix-vector product $(\mathbf{A} + \mathbf{A}^\top)\,\mathbf{x}$. Thus, stacking all $D$ partial derivatives into the gradient vector gives:
+ 
+$$
+\frac{\partial\, \mathbf{x}^\top \mathbf{A} \mathbf{x}}{\partial \mathbf{x}} = (\mathbf{A} + \mathbf{A}^\top)\, \mathbf{x}
+$$
+ 
+### 1.3 Constrained optimization
+ 
+The constraint is $g(x_1, x_2) = x_1 \cdot x_2 = 4$. Since the product equals $4$, we have $x_2 \neq 0$, so we can divide by $x_2$:
+ 
+$$
+x_1 \cdot x_2 = 4 \iff x_1 = \frac{4}{x_2}
+$$
+ 
+We substitute $x_1$ in $f$, which gives a function $h$ of the single variable $x_2$:
+ 
+$$
+h(x_2) = f\left(\frac{4}{x_2}, x_2\right) = \left(\frac{4}{x_2}\right)^2 + x_2^2 = \frac{16}{x_2^2} + x_2^2
+$$
+ 
+We differentiate with respect to $x_2$. For the first term, we use $\left(\frac{1}{u}\right)' = -\frac{u'}{u^2}$ with $u = x_2^2$ and $u' = 2x_2$:
+ 
+$$
+h'(x_2) = 2x_2 - 16 \cdot \frac{2x_2}{x_2^4} = 2x_2 - \frac{32}{x_2^3}
+$$
+ 
+Setting the derivative to $0$ (and multiplying both sides by $\frac{x_2^3}{2}$):
+ 
+$$
+\begin{aligned}
+h'(x_2) = 2x_2 - \frac{32}{x_2^3} = 0
+&\iff 2x_2 = \frac{32}{x_2^3} \\
+&\iff x_2 \cdot x_2^3 = \frac{32}{2} \\
+&\iff x_2^4 = 16 = 2^4
+\end{aligned}
+$$
+ 
+So $x_2 = 2$ or $x_2 = -2$.
+ 
+Second derivative, to check that these points are minima:
+ 
+$$
+h''(x_2) = \frac{d}{dx_2}\left(2x_2 - \frac{32}{x_2^3}\right) = 2 + 32 \cdot \frac{3x_2^2}{x_2^6} = 2 + \frac{96}{x_2^4} > 0
+$$
+ 
+because $x_2^4 > 0$ (even power of $x_2 \neq 0$).
+ 
+For $x_2 = 2$:
+ 
+$$
+x_1 = \frac{4}{2} = 2 = x_2, \qquad f(2, 2) = 2^2 + 2^2 = 8
+$$
+ 
+For $x_2 = -2$:
+ 
+$$
+x_1 = \frac{4}{-2} = -2, \qquad f(-2, -2) = (-2)^2 + (-2)^2 = 8
+$$
+ 
+The minimum of $f$ subject to $g(x_1, x_2) = 4$ is $8$, reached at $(x_1, x_2) = (2, 2)$ and $(x_1, x_2) = (-2, -2)$.
+ 
 ### 1.4 Maximum likelyhood estimation
 
 
@@ -164,9 +282,12 @@ $$
 Thus $\mathbb{E}\left[\hat{\sigma}^2_{\text{ML}}\right] \neq \sigma^2$, and it is smaller since $\frac{N - 1}{N} < 1$, which demonstrates that $\hat{\sigma}^2_{\text{ML}}$ is biased.
 
 ## 2 Linear regression
+
 ### 2.1 parameters of linear regression
+
 #### 2.1.1
- 
+
+All sums run over $n = 1, \dots, N$.
 Loss to minimize:
  
 $$
@@ -271,9 +392,9 @@ $$
  
 #### 2.1.2
  
-Let's verify if results from 2.1.1 are identical to (3):
+Let's verify if result from 2.1.1 is identical to (3):
  
-For $\mathbf{X} \in \mathbb{R}^{N \times 2}$ and $\mathbf{y} \in \mathbb{R}^{N}$: compute $\mathbf{X}^\top \mathbf{X}$.
+With $\mathbf{X} \in \mathbb{R}^{N \times 2}$ and $\mathbf{y} \in \mathbb{R}^{N}$: compute $\mathbf{X}^\top \mathbf{X}$.
  
 $$
 \mathbf{X} = \begin{pmatrix} x_{1,1} & x_{1,2} \\ \vdots & \vdots \\ x_{N,1} & x_{N,2} \end{pmatrix}
@@ -309,7 +430,7 @@ $$
 \mathbf{X}^\top \mathbf{X} = \begin{pmatrix} A & B \\ B & C \end{pmatrix} \quad\text{and}\quad \mathbf{X}^\top \mathbf{y} = \begin{pmatrix} D \\ E \end{pmatrix}
 $$
  
-So
+So:
  
 $$
 \mathbf{w} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{y}
@@ -337,6 +458,9 @@ $$
  
 which corresponds to $\mathbf{w} = \begin{pmatrix} w_1 \\ w_2 \end{pmatrix}$ from previous findings.
  
+
+### 2.2 Least square loss
+
 #### 2.2.1
  
 Assuming the $N$ observations $\mathcal{D} = \{(x_1, y_1) \dots (x_N, y_N)\}$ are independent and identically distributed, the joint probability density factorizes as:
@@ -345,7 +469,7 @@ $$
 p(\mathcal{D} \mid w) = \prod p(x_n, y_n \mid w)
 $$
  
-Applying the product rule mentioned:
+Applying the product rule mentioned in the hint:
  
 $$
 p(a, b) = p(a \mid b)\,p(b)
@@ -357,28 +481,37 @@ $$
 p(\mathcal{D} \mid w) = \prod p(y_n \mid x_n, w)\,p(x_n)
 $$
  
-Because $y_n \mid x_n, w \sim \mathcal{N}(w \cdot x_N, \sigma^2)$ the conditional density is
+Because $y_n \mid x_n, w \sim \mathcal{N}(w \cdot x_n, \sigma^2)$ the conditional density is
  
 $$
-p(y_n \mid x_n, w) = \frac{1}{\sqrt{2\pi\sigma^2}}\,e^{\left(-\frac{1(y_n - w \cdot x_n)}{2\sigma^2}\right)}
+p(y_n \mid x_n, w) = \frac{1}{\sqrt{2\pi\sigma^2}}\,e^{\left(-\frac{1(y_n - w \cdot x_n)^2}{2\sigma^2}\right)}
 $$
  
-$$
-= \frac{1}{2}\ln(2\pi\sigma^2) - \frac{1(y_n - w \cdot x_n)}{2\sigma^2} + \ln(p(x_n)) \quad (\text{constante})
-$$
+Taking the log of one term of the product, $p(y_n \mid x_n, w)\,p(x_n)$:
  
 $$
-= \sum\left(-\frac{1}{2}\ln(2\pi\sigma^2) - \frac{1(y_n - w \cdot x_n)^2}{2\sigma^2} + \text{constante}\right)
+\ln\big(p(y_n \mid x_n, w)\,p(x_n)\big) = -\frac{1}{2}\ln(2\pi\sigma^2) - \frac{1(y_n - w \cdot x_n)^2}{2\sigma^2} + \ln(p(x_n))
+$$
+ 
+$\ln(p(x_n))$ does not depend on $w$, so it is a constant, which we call $c_n = \ln(p(x_n))$.
+ 
+The log turns the product into a sum, so the log-likelihood $\ell(w) = \ln p(\mathcal{D} \mid w)$ is:
+ 
+$$
+\ell(w) = \sum\left(-\frac{1}{2}\ln(2\pi\sigma^2) - \frac{1(y_n - w \cdot x_n)^2}{2\sigma^2} + c_n\right)
 $$
  
 $$
 = -\frac{1}{2}N\ln 2\pi - \frac{1}{2}N\ln(\sigma^2) - \frac{1}{2\sigma^2}\sum(y_n - w \cdot x_n)^2 + \text{cst}
 $$
  
+where $\text{cst} = \sum c_n = \sum \ln(p(x_n))$ is the sum of all these constants, so it does not depend on $w$ either.
+ 
+ 
 #### 2.2.2
  
 To find the maximum likelihood estimate $\tilde{w}_{\text{ML}}$ we maximize $l(w)$ with respect to $w$:
-With what we find in 2.2.1:
+With what we fond in 2.2.1:
  
 $$
 \tilde{w}_{\text{ML}} = \arg\max_{w}\left[-\frac{N}{2}\ln(2\pi) - \frac{N}{2}\ln(\sigma^2) - \frac{1}{2\sigma^2}\sum(y_n - w \cdot x_n)^2 + C\right]
@@ -402,4 +535,207 @@ $$
 \tilde{w}_{\text{ML}} = \arg\min_{w}\left[\sum_{n=1}^{N}(y_n - w \cdot x_n)^2\right]
 $$
  
-almost is equivalent to (2) without $1/N$.
+which is (2) without $1/N$.
+
+Since $\frac{1}{N} > 0$, multiplying by $\frac{1}{N}$ does not change the argmin, so maximizing the log-likelihood is exactly equivalent to minimizing (2).
+
+## 3 Logistic regression
+ 
+### 3.1
+ 
+We write $p = P(y = 1 \mid \mathbf{x})$, so $1 - p = P(y = 0 \mid \mathbf{x})$. The log-odds is linear in $\mathbf{x}$:
+ 
+$$
+\mathbf{w}^\top \mathbf{x} = \ln\left(\frac{p}{1-p}\right)
+$$
+ 
+Taking the exponential of both sides and solving for $p$:
+ 
+$$
+e^{\mathbf{w}^\top \mathbf{x}} = \frac{p}{1-p} \quad\Rightarrow\quad p = (1-p)\,e^{\mathbf{w}^\top \mathbf{x}} = e^{\mathbf{w}^\top \mathbf{x}} - p\,e^{\mathbf{w}^\top \mathbf{x}}
+$$
+ 
+$$
+p + p\,e^{\mathbf{w}^\top \mathbf{x}} = e^{\mathbf{w}^\top \mathbf{x}}
+$$
+ 
+$$
+p\left(1 + e^{\mathbf{w}^\top \mathbf{x}}\right) = e^{\mathbf{w}^\top \mathbf{x}}
+$$
+ 
+$$
+p = \frac{e^{\mathbf{w}^\top \mathbf{x}}}{1 + e^{\mathbf{w}^\top \mathbf{x}}}
+$$
+ 
+Dividing the numerator and the denominator by $e^{\mathbf{w}^\top \mathbf{x}}$:
+ 
+$$
+p = \frac{e^{\mathbf{w}^\top \mathbf{x}} / e^{\mathbf{w}^\top \mathbf{x}}}{\left(1 + e^{\mathbf{w}^\top \mathbf{x}}\right) / e^{\mathbf{w}^\top \mathbf{x}}} = \frac{1}{e^{-\mathbf{w}^\top \mathbf{x}} + 1}
+$$
+ 
+So:
+ 
+$$
+P(y = 1 \mid \mathbf{x}) = \frac{1}{1 + e^{-\mathbf{w}^\top \mathbf{x}}} = \sigma(\mathbf{w}^\top \mathbf{x}) \quad \text{with} \quad \sigma(z) = \frac{1}{1 + e^{-z}}
+$$
+ 
+where $\sigma$ is the standard logistic sigmoid function.
+ 
+### 3.2
+ 
+From 3.1:
+ 
+$$
+p = \sigma(\mathbf{w}^\top \mathbf{x}) = \frac{1}{1 + e^{-\mathbf{w}^\top \mathbf{x}}}
+$$
+ 
+and so:
+ 
+$$
+1 - p = 1 - \frac{1}{1 + e^{-\mathbf{w}^\top \mathbf{x}}} = \frac{e^{-\mathbf{w}^\top \mathbf{x}}}{1 + e^{-\mathbf{w}^\top \mathbf{x}}}
+$$
+ 
+For sample $n$, we write $\hat{y}_n$ for the predicted probability:
+ 
+$$
+\hat{y}_n = P(y_n = 1 \mid \mathbf{x}_n, \mathbf{w}) = \sigma(\mathbf{w}^\top \mathbf{x}_n)
+$$
+ 
+Since $y_n$ is $0$ or $1$, both cases fit in one formula:
+ 
+$$
+P(y_n \mid \mathbf{x}_n, \mathbf{w}) = \hat{y}_n^{\,y_n} \left(1 - \hat{y}_n\right)^{1 - y_n}
+$$
+ 
+Assuming the observations are i.i.d.:
+ 
+$$
+L(\mathbf{w}) = \prod_{n=1}^{N} P(y_n \mid \mathbf{x}_n, \mathbf{w}) = \prod_{n=1}^{N} \hat{y}_n^{\,y_n} \left(1 - \hat{y}_n\right)^{1 - y_n}
+$$
+ 
+Taking the log:
+ 
+$$
+\ln\big(L(\mathbf{w})\big) = \sum_{n=1}^{N} \Big[\, y_n \ln \hat{y}_n + (1 - y_n) \ln(1 - \hat{y}_n) \Big]
+$$
+ 
+As in 2.2.2, maximizing $\ln(L(\mathbf{w}))$ is the same as minimizing its opposite, and multiplying by $\frac{1}{N}$ does not change the argmin:
+ 
+$$
+\hat{\mathbf{w}}_{\text{ML}} = \arg\max_{\mathbf{w}} \ln\big(L(\mathbf{w})\big) = \arg\min_{\mathbf{w}} \Big(-\ln\big(L(\mathbf{w})\big)\Big)
+$$
+ 
+$$
+= \arg\min_{\mathbf{w}} \left( -\frac{1}{N} \sum_{n=1}^{N} \Big[\, y_n \ln \sigma(\mathbf{w}^\top \mathbf{x}_n) + (1 - y_n) \ln\big(1 - \sigma(\mathbf{w}^\top \mathbf{x}_n)\big) \Big] \right)
+$$
+ 
+which is the logistic loss (binary cross-entropy).
+ 
+
+## 4 Clustering
+
+### 4.1 K-Means
+ 
+With the assignments $a_{n,k}$ fixed, only the terms of cluster $k$ depend on $\mathbf{c}_k$, so for a fixed $k$ we can write:
+ 
+$$
+J(\mathbf{c}_k) = \frac{1}{N}\sum_{n=1}^{N} a_{n,k}\,\|\mathbf{x}_n - \mathbf{c}_k\|_2^2
+$$
+ 
+Derivative with respect to $\mathbf{c}_k$ (chain rule, the derivative of $\mathbf{x}_n - \mathbf{c}_k$ is $-1$):
+ 
+$$
+\frac{\partial J}{\partial \mathbf{c}_k} = \frac{1}{N}\sum_{n=1}^{N} 2\left(a_{n,k}(\mathbf{x}_n - \mathbf{c}_k)\right)\cdot(-1)
+$$
+ 
+$$
+= -\frac{2}{N}\sum_{n=1}^{N} a_{n,k}(\mathbf{x}_n - \mathbf{c}_k)
+$$
+ 
+At the minimum, the derivative is zero:
+ 
+$$
+-\frac{2}{N}\sum_{n=1}^{N} a_{n,k}(\mathbf{x}_n - \mathbf{c}_k) = 0
+$$
+ 
+$$
+\Rightarrow \sum_{n=1}^{N} a_{n,k}(\mathbf{x}_n - \mathbf{c}_k) = 0
+$$
+ 
+$$
+\Rightarrow \sum_{n=1}^{N}\left(a_{n,k}\,\mathbf{x}_n - a_{n,k}\,\mathbf{c}_k\right) = 0
+$$
+ 
+$\mathbf{c}_k$ does not depend on $n$, so it comes out of the sum:
+ 
+$$
+\Rightarrow \sum_{n=1}^{N} a_{n,k}\,\mathbf{x}_n - \mathbf{c}_k\sum_{n=1}^{N} a_{n,k} = 0
+$$
+ 
+Assuming cluster $k$ is not empty, i.e. $\sum_{n=1}^{N} a_{n,k} \neq 0$, we can divide:
+ 
+$$
+\Rightarrow \mathbf{c}_k = \frac{\sum_{n=1}^{N} a_{n,k}\,\mathbf{x}_n}{\sum_{n=1}^{N} a_{n,k}}
+$$
+ 
+So $\mathbf{c}_k$ is the mean of the points assigned to cluster $k$.
+ 
+### 4.2 Hierarchical clustering and Levenshtein distance
+ 
+#### 4.2.1
+ 
+We check the four properties of a distance, for all strings $m$, $n$ and $p$:
+ 
+1) $d(m,n)$ is the number of character insertions, deletions or substitutions necessary to transform $m$ into $n$. Thus the distance is defined as a count of discrete edit operations, which cannot be negative. Therefore:
+$$
+d(m,n) \geq 0
+$$
+ 
+2) If $m = n$, then no insertion, deletion or substitution is needed, so $d(m,n) = 0$. Conversely, $d(m,n) = 0$ means that no operation is needed to transform $m$ into $n$, so $n$ is $m$ unchanged. Thus:
+$$
+d(m,n) = 0 \iff m = n
+$$
+ 
+3) Every edit operation has an exact inverse operation (e.g. inserting an "a" is undone by deleting this "a", deleting an "a" is undone by inserting it back, substituting "a" by "b" is undone by substituting "b" by "a"). Therefore, any sequence of $k = d(m,n)$ operations transforming $m$ into $n$ can be reversed step by step to transform $n$ into $m$ with $k$ operations, so $d(n,m) \leq d(m,n)$. Swapping the roles of $m$ and $n$ gives $d(m,n) \leq d(n,m)$. Thus:
+$$
+d(m,n) = d(n,m)
+$$
+ 
+4) Let's transform $m$ into $n$ with an intermediate step going through $p$. $d(m,p)$ is the minimum number of operations to transform $m$ into $p$, and $d(p,n)$ is the minimum number of operations to transform $p$ into $n$. Concatenating these two sequences of operations produces a sequence of $d(m,p) + d(p,n)$ operations transforming $m$ into $n$. Since $d(m,n)$ is by definition the minimum number of operations to transform $m$ into $n$, it is less than or equal to the number of operations of this sequence. Thus:
+$$
+d(m,n) \leq d(m,p) + d(p,n)
+$$
+ 
+The four axioms hold, so the Levenshtein distance is a distance.
+ 
+#### 4.2.2
+ 
+With single linkage, $D(C_i, C_j) = \min_{x \in C_i,\, y \in C_j} d(x, y)$. One counterexample to the triangle inequality is enough.
+ 
+We take $d(x,y) = |x - y|$ and 3 non-overlapping clusters:
+ 
+$$
+C_1 = \{0\} \qquad C_2 = \{1, 2, 3\} \qquad C_3 = \{4, 5\}
+$$
+ 
+A distance would satisfy $D(C_1, C_3) \le D(C_1, C_2) + D(C_2, C_3)$. Here:
+ 
+$$
+D(C_1, C_3) = \min_{x \in \{0\},\, y \in \{4, 5\}} |x - y| = |0 - 4| = 4
+$$
+ 
+$$
+D(C_1, C_2) = \min_{x \in \{0\},\, y \in \{1, 2, 3\}} |x - y| = |0 - 1| = 1
+$$
+ 
+$$
+D(C_2, C_3) = \min_{x \in \{1, 2, 3\},\, y \in \{4, 5\}} |x - y| = |3 - 4| = 1
+$$
+ 
+Thus
+ 
+$$
+D(C_1, C_3) > D(C_1, C_2) + D(C_2, C_3) \quad \text{because} \quad 4 > 1 + 1
+$$
+ 
+The triangle inequality fails, so the single-linkage criterion is not a distance.
