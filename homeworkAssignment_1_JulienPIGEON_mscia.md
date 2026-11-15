@@ -1,39 +1,39 @@
 # Homework assignment 1:
-
+ 
 Author: Julien Pigeon for his ML class at CentraleSupelec (MScIA)
-
-## 1. Fundamental concepts
-
+ 
+## 1 Fundamental concepts
+ 
 ### 1.1 Bayes theorem
-
+ 
 Based on the text we know that:
 $$
 P(+ \mid M) = 0.95 \qquad P(+ \mid \bar{M}) = 0.01 \qquad P(M) = 0.001 \qquad P(\bar{M}) = 1 - P(M) = 0.999
 $$
  
-And with the Bayes therorem we can get:
+And with the Bayes theorem we can get:
 $$
 P(M \mid +) = \frac{P(+ \mid M)\,P(M)}{P(+ \mid M)\,P(M) + P(+ \mid \bar{M})\,P(\bar{M})}
 $$
  
-
+ 
 $$
 = \frac{0.95 \times 0.001}{0.95 \times 0.001 + 0.01 \times 0.999} = 0.087
 $$
  
-Thus a person with a positive test has only about a 8.7% risk of being infected.
-
-
+Thus a person with a positive test has only about an 8.7% risk of being infected.
+ 
+ 
 ### 1.2 Matrix calculus
-
+ 
 Let's start by writing $f$ as a double sum over the components of $\mathbf{x}$:
-
+ 
 $$
 f(\mathbf{x}) = \mathbf{x}^\top \mathbf{A} \mathbf{x} = \sum_{i=1}^{D} \sum_{j=1}^{D} A_{ij}\, x_i\, x_j
 $$
  
 We differentiate with respect to one component $x_k$, using the product rule:
-
+ 
 $$
 \frac{\partial (x_i x_j)}{\partial x_k} = \frac{\partial x_i}{\partial x_k}\, x_j + x_i\, \frac{\partial x_j}{\partial x_k} = \delta_{ik}\, x_j + x_i\, \delta_{jk}
 $$
@@ -49,7 +49,7 @@ $$
 = \sum_{i=1}^{D} \sum_{j=1}^{D} A_{ij}\, \delta_{ik}\, x_j + \sum_{i=1}^{D} \sum_{j=1}^{D} A_{ij}\, x_i\, \delta_{jk}
 $$
  
-$\delta_{ik}$ collapses the sum over $i$ to $i = k$, and $\delta_{jk}$ collapses the sum over $j$ to $j = k$:
+$\delta_{ik}$ is 0 unless $i = k$ so in the first double sum, only the terms with $i = k$ remain. Same for $\delta_{jk}$ in the second one with $j = k$.
  
 $$
 \Rightarrow \frac{\partial f(\mathbf{x})}{\partial x_k} = \sum_{j=1}^{D} A_{kj}\, x_j + \sum_{i=1}^{D} A_{ik}\, x_i
@@ -81,7 +81,7 @@ $$
 h(x_2) = f\left(\frac{4}{x_2}, x_2\right) = \left(\frac{4}{x_2}\right)^2 + x_2^2 = \frac{16}{x_2^2} + x_2^2
 $$
  
-We differentiate with respect to $x_2$. For the first term, we use $\left(\frac{1}{u}\right)' = -\frac{u'}{u^2}$ with $u = x_2^2$ and $u' = 2x_2$:
+We differentiate with respect to $x_2$ 
  
 $$
 h'(x_2) = 2x_2 - 16 \cdot \frac{2x_2}{x_2^4} = 2x_2 - \frac{32}{x_2^3}
@@ -106,7 +106,7 @@ $$
 h''(x_2) = \frac{d}{dx_2}\left(2x_2 - \frac{32}{x_2^3}\right) = 2 + 32 \cdot \frac{3x_2^2}{x_2^6} = 2 + \frac{96}{x_2^4} > 0
 $$
  
-because $x_2^4 > 0$ (even power of $x_2 \neq 0$).
+because anything to the power of 4 would be positive. 
  
 For $x_2 = 2$:
  
@@ -122,19 +122,19 @@ $$
  
 The minimum of $f$ subject to $g(x_1, x_2) = 4$ is $8$, reached at $(x_1, x_2) = (2, 2)$ and $(x_1, x_2) = (-2, -2)$.
  
-### 1.4 Maximum likelyhood estimation
-
-
+### 1.4 Maximum likelihood estimation
+ 
+ 
 #### 1.4.1 Log-likelihood
-
-Because we assume that we have N independent and identically distributed (i.i.d.) samples x = {x1, x2, . . . , xN }, the likelihood is the product of the individual densities:
-
+ 
+Because we assume that we have N independent and identically distributed (i.i.d.) samples $\mathbf{x} = \{x_1, x_2, \dots, x_N\}$, the likelihood is the product of the individual densities:
+ 
 $$
 p(\mathbf{x} \mid \mu, \sigma^2) = \prod_{n=1}^{N} \mathcal{N}(x_n \mid \mu, \sigma^2)
 $$
-
-Taking the natural logarithm turns the product into a sum, using $\ln(ab) = \ln a + \ln b$:
-
+ 
+Using the ln of this product turns it in a sum:
+ 
 $$
 \begin{aligned}
 \ln p(\mathbf{x} \mid \mu, \sigma^2)
@@ -144,9 +144,8 @@ $$
 &= \sum_{n=1}^{N} \left( \ln\left( (2\pi\sigma^2)^{-1/2} \right) + \ln\left( \exp\left( -\frac{(x_n-\mu)^2}{2\sigma^2} \right) \right) \right)
 \end{aligned}
 $$
-
-We use $\ln(a^k) = k \ln a$ and $\ln(\exp(u)) = u$:
-
+ 
+ 
 $$
 \begin{aligned}
 \ln p(\mathbf{x} \mid \mu, \sigma^2)
@@ -154,17 +153,15 @@ $$
 &= -\frac{N}{2}\ln(2\pi) - \frac{N}{2}\ln(\sigma^2) - \frac{1}{2\sigma^2}\sum_{n=1}^{N}(x_n-\mu)^2
 \end{aligned}
 $$
-
-The first two terms do not depend on $n$, so summing them $N$ times multiplies them by $N$. We write $\mathcal{L}(\mu, \sigma^2) = \ln p(\mathbf{x} \mid \mu, \sigma^2)$:
-
+ 
 $$
 \boxed{\mathcal{L}(\mu, \sigma^2) = -\frac{N}{2}\ln(2\pi) - \frac{N}{2}\ln(\sigma^2) - \frac{1}{2\sigma^2}\sum_{n=1}^{N}(x_n-\mu)^2}
 $$
-
+ 
 #### 1.4.2 Maximum likelihood estimator of $\mu$
-
-Variable: $\mu$. Constants: $\sigma^2$, $N$, $x_1, \dots, x_N$. The first two terms of $\mathcal{L}$ do not depend on $\mu$, so their derivative is $0$. By the chain rule, $\frac{\partial}{\partial \mu}(x_n-\mu)^2 = 2(x_n-\mu)\cdot(-1)$:
-
+ 
+Variable: $\mu$. Constants: $\sigma^2$, $N$, $x_1, \dots, x_N$. The first two terms of $\mathcal{L}$ do not depend on $\mu$, so their derivative is $0$.
+ 
 $$
 \begin{aligned}
 \frac{\partial \mathcal{L}}{\partial \mu}
@@ -173,9 +170,9 @@ $$
 &= \frac{1}{\sigma^2}\sum_{n=1}^{N}(x_n-\mu)
 \end{aligned}
 $$
-
+ 
 Setting the derivative to $0$ (and multiplying both sides by $\sigma^2 > 0$):
-
+ 
 $$
 \begin{aligned}
 \frac{1}{\sigma^2}\sum_{n=1}^{N}(x_n-\mu) = 0
@@ -183,25 +180,22 @@ $$
 &\iff \sum_{n=1}^{N} x_n - N\mu = 0
 \end{aligned}
 $$
-
+ 
+$$
+\sum_{n=1}^{N} x_n = N\mu \iff \mu = \frac{1}{N}\sum_{n=1}^{N} x_n
+$$
+ 
 $$
 \boxed{\hat{\mu}_{\text{ML}} = \frac{1}{N}\sum_{n=1}^{N} x_n}
 $$
-
+ 
 The maximum likelihood estimator of $\mu$ is the sample mean.
-
-Check with a small example: $\mathbf{x} = (1, 5, 3)$, $N = 3$:
-
-$$
-\hat{\mu}_{\text{ML}} = \frac{1+5+3}{3} = \frac{9}{3} = 3
-$$
-
-and indeed $\sum_{n}(x_n - 3) = -2 + 2 + 0 = 0$.
-
+ 
+ 
 #### 1.4.3 Maximum likelihood estimator of $\sigma^2$
-
-Variable: $\sigma^2$, treated as one block (we write $s = \sigma^2$ in our head). Constants: $\mu$, $N$, $x_1, \dots, x_N$. The term $-\frac{N}{2}\ln(2\pi)$ is constant, and we use $\frac{d}{ds}\ln s = \frac{1}{s}$ and $\frac{d}{ds}\frac{1}{s} = -\frac{1}{s^2}$:
-
+ 
+Let's derive with respect to $\sigma^2$
+ 
 $$
 \begin{aligned}
 \frac{\partial \mathcal{L}}{\partial \sigma^2}
@@ -209,9 +203,9 @@ $$
 &= -\frac{N}{2\sigma^2} + \frac{1}{2(\sigma^2)^2}\sum_{n=1}^{N}(x_n-\mu)^2
 \end{aligned}
 $$
-
+ 
 Setting the derivative to $0$ and multiplying both sides by $2(\sigma^2)^2 > 0$:
-
+ 
 $$
 \begin{aligned}
 -\frac{N}{2\sigma^2} + \frac{1}{2(\sigma^2)^2}\sum_{n=1}^{N}(x_n-\mu)^2 = 0
@@ -219,29 +213,21 @@ $$
 &\iff \sigma^2 = \frac{1}{N}\sum_{n=1}^{N}(x_n-\mu)^2
 \end{aligned}
 $$
-
+ 
 Both derivatives must be $0$ at the same time, so we replace $\mu$ by the estimator $\hat{\mu}_{\text{ML}}$ found in 1.4.2:
-
+ 
 $$
 \boxed{\hat{\sigma}^2_{\text{ML}} = \frac{1}{N}\sum_{n=1}^{N}\left(x_n-\hat{\mu}_{\text{ML}}\right)^2}
 $$
-
-Check with the same example: $\mathbf{x} = (1, 5, 3)$, $\hat{\mu}_{\text{ML}} = 3$:
-
-$$
-\hat{\sigma}^2_{\text{ML}} = \frac{(1-3)^2 + (5-3)^2 + (3-3)^2}{3} = \frac{4+4+0}{3} = \frac{8}{3}
-$$
-
-#### 1.4.a: bonus
+ 
+#### 1.4.a Bonus
  
 We compute the expectation of the estimator found in 1.4.3, using the definition of $\hat{\sigma}^2_{\text{ML}}$:
  
 $$
 \mathbb{E}\left[\hat{\sigma}^2_{\text{ML}}\right] = \mathbb{E}\left[\frac{1}{N}\sum_{n=1}^{N}\left(x_n - \hat{\mu}_{\text{ML}}\right)^2\right]
 $$
- 
-We expand the square, $(a - b)^2 = a^2 - 2ab + b^2$, and take the constant $\frac{1}{N}$ out of the expectation:
- 
+  
 $$
 \mathbb{E}\left[\hat{\sigma}^2_{\text{ML}}\right] = \frac{1}{N}\,\mathbb{E}\left[\sum_{n=1}^{N}\left(x_n^2 - 2x_n\hat{\mu}_{\text{ML}} + \hat{\mu}_{\text{ML}}^2\right)\right]
 $$
@@ -280,13 +266,13 @@ $$
 $$
  
 Thus $\mathbb{E}\left[\hat{\sigma}^2_{\text{ML}}\right] \neq \sigma^2$, and it is smaller since $\frac{N - 1}{N} < 1$, which demonstrates that $\hat{\sigma}^2_{\text{ML}}$ is biased.
-
+ 
 ## 2 Linear regression
-
-### 2.1 parameters of linear regression
-
+ 
+### 2.1 Parameters of linear regression
+ 
 #### 2.1.1
-
+ 
 All sums run over $n = 1, \dots, N$.
 Loss to minimize:
  
@@ -315,7 +301,7 @@ $$
 $$
  
 $$
-= \sum(-x_{n1} y_n) + w_1 \sum x_{n1}^2 + w_2 \sum(x_{n2} \cdot x_{n1}) = 0
+\Rightarrow \sum(-x_{n1} y_n) + w_1 \sum x_{n1}^2 + w_2 \sum(x_{n2} \cdot x_{n1}) = 0
 $$
  
 Setting the derivative with respect to $w_2$ to $0$:
@@ -325,7 +311,7 @@ $$
 $$
  
 $$
-\Rightarrow \sum(-x_{n1} y_n) + w_2 \sum x_{n2}^2 + w_1 \sum(x_{n1} \cdot x_{n2})
+\Rightarrow \sum(-x_{n2} y_n) + w_2 \sum x_{n2}^2 + w_1 \sum(x_{n1} \cdot x_{n2}) = 0
 $$
  
 To keep the notation clean we will define:
@@ -347,7 +333,7 @@ $$
 Second equation:
  
 $$
-\frac{\partial \ell}{\partial w_2} = -E + w_1 B + w_2 C = 0
+\Rightarrow -E + w_1 B + w_2 C = 0
 $$
  
 Substituting $w_1$:
@@ -372,7 +358,7 @@ $$
 \boxed{w_2 = \frac{AE - BD}{AC - B^2}}
 $$
  
-Let's verify: by substituting $w_2$ into $w_1$
+Let's verify by substituting $w_2$ into $w_1$
  
 $$
 w_1 = \frac{D - w_2 B}{A} = \frac{D - \left(\frac{AE - BD}{AC - B^2}\right) B}{A}
@@ -390,6 +376,8 @@ $$
 w_1 = \frac{DC - BE}{AC - B^2}
 $$
  
+Valid if $AC - B^2 \neq 0$, since it is the denominator of both $w_1$ and $w_2$. On the way we also divided by $A$, so we assumed $A \neq 0$ too.
+ 
 #### 2.1.2
  
 Let's verify if result from 2.1.1 is identical to (3):
@@ -397,31 +385,31 @@ Let's verify if result from 2.1.1 is identical to (3):
 With $\mathbf{X} \in \mathbb{R}^{N \times 2}$ and $\mathbf{y} \in \mathbb{R}^{N}$: compute $\mathbf{X}^\top \mathbf{X}$.
  
 $$
-\mathbf{X} = \begin{pmatrix} x_{1,1} & x_{1,2} \\ \vdots & \vdots \\ x_{N,1} & x_{N,2} \end{pmatrix}
+\mathbf{X} = \begin{pmatrix} x_{11} & x_{12} \\ \vdots & \vdots \\ x_{N1} & x_{N2} \end{pmatrix}
 $$
  
 We have
  
 $$
-\mathbf{X}^\top \mathbf{X} = \begin{pmatrix} x_{1,1} & \cdots & x_{N,1} \\ x_{1,2} & \cdots & x_{N,2} \end{pmatrix} \begin{pmatrix} x_{1,1} & x_{1,2} \\ \vdots & \vdots \\ x_{N,1} & x_{N,2} \end{pmatrix}
+\mathbf{X}^\top \mathbf{X} = \begin{pmatrix} x_{11} & \cdots & x_{N1} \\ x_{12} & \cdots & x_{N2} \end{pmatrix} \begin{pmatrix} x_{11} & x_{12} \\ \vdots & \vdots \\ x_{N1} & x_{N2} \end{pmatrix}
 $$
  
 $$
-= \begin{pmatrix} \sum x_{n,1}^2 & \sum x_{n,1}\,x_{n,2} \\ \sum x_{n,1}\,x_{n,2} & \sum x_{n,2}^2 \end{pmatrix}
+= \begin{pmatrix} \sum x_{n1}^2 & \sum x_{n1}\,x_{n2} \\ \sum x_{n1}\,x_{n2} & \sum x_{n2}^2 \end{pmatrix}
 $$
  
 $$
-\mathbf{X}^\top \mathbf{y} = \begin{pmatrix} x_{1,1} & \cdots & x_{N,1} \\ x_{1,2} & \cdots & x_{N,2} \end{pmatrix} \begin{pmatrix} y_1 \\ \vdots \\ y_N \end{pmatrix} = \begin{pmatrix} \sum x_{n,1}\,y_n \\ \sum x_{n,2}\,y_n \end{pmatrix}
+\mathbf{X}^\top \mathbf{y} = \begin{pmatrix} x_{11} & \cdots & x_{N1} \\ x_{12} & \cdots & x_{N2} \end{pmatrix} \begin{pmatrix} y_1 \\ \vdots \\ y_N \end{pmatrix} = \begin{pmatrix} \sum x_{n1}\,y_n \\ \sum x_{n2}\,y_n \end{pmatrix}
 $$
  
 Using previous terms:
  
 $$
-A = \sum x_{n,1}^2 \qquad B = \sum x_{n,1}\,x_{n,2} \qquad C = \sum x_{n,2}^2
+A = \sum x_{n1}^2 \qquad B = \sum x_{n1}\,x_{n2} \qquad C = \sum x_{n2}^2
 $$
  
 $$
-D = \sum x_{n,1}\,y_n \qquad E = \sum x_{n,2}\,y_n
+D = \sum x_{n1}\,y_n \qquad E = \sum x_{n2}\,y_n
 $$
  
 Thus we have
@@ -446,6 +434,8 @@ $$
 \begin{pmatrix} a & b \\ c & d \end{pmatrix}^{-1} = \frac{1}{ad - bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}
 $$
  
+ This formula only works if $ad - bc \neq 0$ (the determinant), otherwise we divide by $0$ and the matrix has no inverse. Here $ad - bc = AC - B^2$, so we need $AC - B^2 \neq 0$, the same condition as in 2.1.1.
+ 
 Thus
  
 $$
@@ -458,9 +448,9 @@ $$
  
 which corresponds to $\mathbf{w} = \begin{pmatrix} w_1 \\ w_2 \end{pmatrix}$ from previous findings.
  
-
+ 
 ### 2.2 Least square loss
-
+ 
 #### 2.2.1
  
 Assuming the $N$ observations $\mathcal{D} = \{(x_1, y_1) \dots (x_N, y_N)\}$ are independent and identically distributed, the joint probability density factorizes as:
@@ -475,7 +465,7 @@ $$
 p(a, b) = p(a \mid b)\,p(b)
 $$
  
-and noting that $p(x_n)$ doesn't depend on $w$, we can consider it a constant $k$.
+and noting that $p(x_n)$ doesn't depend on $w$:
  
 $$
 p(\mathcal{D} \mid w) = \prod p(y_n \mid x_n, w)\,p(x_n)
@@ -484,25 +474,25 @@ $$
 Because $y_n \mid x_n, w \sim \mathcal{N}(w \cdot x_n, \sigma^2)$ the conditional density is
  
 $$
-p(y_n \mid x_n, w) = \frac{1}{\sqrt{2\pi\sigma^2}}\,e^{\left(-\frac{1(y_n - w \cdot x_n)^2}{2\sigma^2}\right)}
+p(y_n \mid x_n, w) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(y_n - w \cdot x_n)^2}{2\sigma^2}\right)
 $$
  
 Taking the log of one term of the product, $p(y_n \mid x_n, w)\,p(x_n)$:
  
 $$
-\ln\big(p(y_n \mid x_n, w)\,p(x_n)\big) = -\frac{1}{2}\ln(2\pi\sigma^2) - \frac{1(y_n - w \cdot x_n)^2}{2\sigma^2} + \ln(p(x_n))
+\ln\big(p(y_n \mid x_n, w)\,p(x_n)\big) = -\frac{1}{2}\ln(2\pi\sigma^2) - \frac{(y_n - w \cdot x_n)^2}{2\sigma^2} + \ln(p(x_n))
 $$
  
 $\ln(p(x_n))$ does not depend on $w$, so it is a constant, which we call $c_n = \ln(p(x_n))$.
  
-The log turns the product into a sum, so the log-likelihood $\ell(w) = \ln p(\mathcal{D} \mid w)$ is:
+The log turns the product into a sum, so the log-likelihood $\mathcal{L}(w) = \ln p(\mathcal{D} \mid w)$ is:
  
 $$
-\ell(w) = \sum\left(-\frac{1}{2}\ln(2\pi\sigma^2) - \frac{1(y_n - w \cdot x_n)^2}{2\sigma^2} + c_n\right)
+\mathcal{L}(w) = \sum\left(-\frac{1}{2}\ln(2\pi\sigma^2) - \frac{(y_n - w \cdot x_n)^2}{2\sigma^2} + c_n\right)
 $$
  
 $$
-= -\frac{1}{2}N\ln 2\pi - \frac{1}{2}N\ln(\sigma^2) - \frac{1}{2\sigma^2}\sum(y_n - w \cdot x_n)^2 + \text{cst}
+= -\frac{N}{2}\ln(2\pi) - \frac{N}{2}\ln(\sigma^2) - \frac{1}{2\sigma^2}\sum(y_n - w \cdot x_n)^2 + \text{cst}
 $$
  
 where $\text{cst} = \sum c_n = \sum \ln(p(x_n))$ is the sum of all these constants, so it does not depend on $w$ either.
@@ -510,35 +500,35 @@ where $\text{cst} = \sum c_n = \sum \ln(p(x_n))$ is the sum of all these constan
  
 #### 2.2.2
  
-To find the maximum likelihood estimate $\tilde{w}_{\text{ML}}$ we maximize $l(w)$ with respect to $w$:
-With what we fond in 2.2.1:
+To find the maximum likelihood estimate $\hat{w}_{\text{ML}}$ we maximize $\mathcal{L}(w)$ with respect to $w$:
+With what we found in 2.2.1:
  
 $$
-\tilde{w}_{\text{ML}} = \arg\max_{w}\left[-\frac{N}{2}\ln(2\pi) - \frac{N}{2}\ln(\sigma^2) - \frac{1}{2\sigma^2}\sum(y_n - w \cdot x_n)^2 + C\right]
+\hat{w}_{\text{ML}} = \arg\max_{w}\left[-\frac{N}{2}\ln(2\pi) - \frac{N}{2}\ln(\sigma^2) - \frac{1}{2\sigma^2}\sum(y_n - w \cdot x_n)^2 + \text{cst}\right]
 $$
  
 Remove all terms that don't depend on $w$:
  
 $$
-\tilde{w}_{\text{ML}} = \arg\max_{w}\left[-\frac{1}{2\sigma^2}\sum_{n=1}^{N}(y_n - w \cdot x_n)^2\right]
+\hat{w}_{\text{ML}} = \arg\max_{w}\left[-\frac{1}{2\sigma^2}\sum(y_n - w \cdot x_n)^2\right]
 $$
  
-Since maximizing a negative quantity is equivalent to minimizing its positive counterpart:
+Maximizing $-g(w)$ is the same as minimizing $g(w)$:
  
 $$
-\tilde{w}_{\text{ML}} = \arg\min_{w}\left[\frac{1}{2\sigma^2}\sum_{n=1}^{N}(y_n - w \cdot x_n)^2\right]
+\hat{w}_{\text{ML}} = \arg\min_{w}\left[\frac{1}{2\sigma^2}\sum(y_n - w \cdot x_n)^2\right]
 $$
  
-Since $\sigma^2 > 0$, the $1/2\sigma^2 > 0$, it just scales the objective without shifting its minimizer, we can remove it from the equation.
+$\frac{1}{2\sigma^2}$ is a positive constant, so it does not change the argmin and we can drop it:
  
 $$
-\tilde{w}_{\text{ML}} = \arg\min_{w}\left[\sum_{n=1}^{N}(y_n - w \cdot x_n)^2\right]
+\hat{w}_{\text{ML}} = \arg\min_{w}\left[\sum(y_n - w \cdot x_n)^2\right]
 $$
  
 which is (2) without $1/N$.
-
+ 
 Since $\frac{1}{N} > 0$, multiplying by $\frac{1}{N}$ does not change the argmin, so maximizing the log-likelihood is exactly equivalent to minimizing (2).
-
+ 
 ## 3 Logistic regression
  
 ### 3.1
@@ -631,9 +621,9 @@ $$
  
 which is the logistic loss (binary cross-entropy).
  
-
+ 
 ## 4 Clustering
-
+ 
 ### 4.1 K-Means
  
 With the assignments $a_{n,k}$ fixed, only the terms of cluster $k$ depend on $\mathbf{c}_k$, so for a fixed $k$ we can write:
@@ -642,7 +632,7 @@ $$
 J(\mathbf{c}_k) = \frac{1}{N}\sum_{n=1}^{N} a_{n,k}\,\|\mathbf{x}_n - \mathbf{c}_k\|_2^2
 $$
  
-Derivative with respect to $\mathbf{c}_k$ (chain rule, the derivative of $\mathbf{x}_n - \mathbf{c}_k$ is $-1$):
+Derivative with respect to $\mathbf{c}_k$:
  
 $$
 \frac{\partial J}{\partial \mathbf{c}_k} = \frac{1}{N}\sum_{n=1}^{N} 2\left(a_{n,k}(\mathbf{x}_n - \mathbf{c}_k)\right)\cdot(-1)
@@ -665,9 +655,7 @@ $$
 $$
 \Rightarrow \sum_{n=1}^{N}\left(a_{n,k}\,\mathbf{x}_n - a_{n,k}\,\mathbf{c}_k\right) = 0
 $$
- 
-$\mathbf{c}_k$ does not depend on $n$, so it comes out of the sum:
- 
+  
 $$
 \Rightarrow \sum_{n=1}^{N} a_{n,k}\,\mathbf{x}_n - \mathbf{c}_k\sum_{n=1}^{N} a_{n,k} = 0
 $$
@@ -710,7 +698,7 @@ The four axioms hold, so the Levenshtein distance is a distance.
  
 #### 4.2.2
  
-With single linkage, $D(C_i, C_j) = \min_{x \in C_i,\, y \in C_j} d(x, y)$. One counterexample to the triangle inequality is enough.
+With single linkage, $D(C_i, C_j) = \min_{x \in C_i,\, y \in C_j} d(x, y)$. 
  
 We take $d(x,y) = |x - y|$ and 3 non-overlapping clusters:
  
@@ -738,4 +726,4 @@ $$
 D(C_1, C_3) > D(C_1, C_2) + D(C_2, C_3) \quad \text{because} \quad 4 > 1 + 1
 $$
  
-The triangle inequality fails, so the single-linkage criterion is not a distance.
+Thus the triangle inequality axiom is not satisfied which demonstrates that the single-linkage criterion is not a distance.
